@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.geertvos</groupId>
+	<artifactId>gossip-api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<parent>
+		<artifactId>gossip</artifactId>
+		<groupId>net.geertvos</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<name>gossip-api</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+	</properties>
+
+	<repositories>
+
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jboss.netty</groupId>
+			<artifactId>netty</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+		</plugins>
+	</build>
+
+</project>
