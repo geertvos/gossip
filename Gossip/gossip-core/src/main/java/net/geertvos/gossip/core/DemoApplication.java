@@ -8,8 +8,8 @@ public class DemoApplication {
 
 	public static void main(String[] args) {
 		
-		GossipClusterMember member1 = new GossipClusterMember("1", "localhost", 8002, System.currentTimeMillis());
-		GossipClusterMember member2 = new GossipClusterMember("2", "localhost", 8002, System.currentTimeMillis());
+		GossipClusterMember member1 = new GossipClusterMember("1", "localhost", 8002, System.currentTimeMillis(),"");
+		GossipClusterMember member2 = new GossipClusterMember("2", "localhost", 8002, System.currentTimeMillis(),"");
 		GossipCluster cluster1 = new GossipCluster("1", "localhost", 8001, member2 );
 		GossipCluster cluster2 = new GossipCluster("2", "localhost", 8002, member1 );
 
@@ -37,19 +37,20 @@ public class DemoApplication {
 			
 			@Override
 			public void onClusterStabalized() {
-				// TODO Auto-generated method stub
-				
+				System.out.println("Stabilized");
 			}
 			
 			@Override
-			public void onClusterDestabalized() {
-				// TODO Auto-generated method stub
-				
+			public void onClusterDestabilized() {
+				System.out.println("Destabilized");
 			}
 		});
 		
 		GossipServer server1 = new GossipServer(cluster1);
+		server1.start();
+		
 		GossipServer server2 = new GossipServer(cluster2);
+		server2.start();
 		
 	}
 	

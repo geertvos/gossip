@@ -10,9 +10,9 @@ import net.geertvos.gossip.core.GossipCluster;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
@@ -21,20 +21,32 @@ public class GossipServer {
 	private ClientBootstrap clientBootstrap;
 	private final GossipCluster cluster;
 	
+	private volatile boolean running = true;
+	private Channel serverChannel;
+	private ServerBootstrap serverBootstrap;
 	
 	public GossipServer(GossipCluster cluster) {
 		this.cluster = cluster;
 		
-		ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
-		bootstrap.setPipelineFactory(new GossipPipelineFactory(cluster,false));
-		bootstrap.bind(new InetSocketAddress(cluster.getHost(), cluster.getPort()));
+		serverBootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+		serverBootstrap.setPipelineFactory(new GossipPipelineFactory(cluster,false));
 
 		clientBootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
 		clientBootstrap.setPipelineFactory(new GossipPipelineFactory(cluster,true));
 		
-		Thread runner = new Thread(new RandomGossip());
+	}
+	
+	public void start() {
+		serverChannel = serverBootstrap.bind(new InetSocketAddress(cluster.getHost(), cluster.getPort()));
+
+		Thread runner = new Thread(new RandomGossip(),"GossipServer Thread");
 		runner.start();
 		
+	}
+	
+	public void shutdown() {
+		running = false;
+		serverChannel.close();
 	}
 	
 	class RandomGossip implements Runnable {
@@ -43,7 +55,7 @@ public class GossipServer {
 		
 		@Override
 		public void run() {
-			while(true) {
+			while(running) {
 				randomGossip();
 				try {
 					Thread.sleep(200);
@@ -65,14 +77,14 @@ public class GossipServer {
 			}
 		}
 
-		private void gossipWith(ClusterMember member) {
+		private void gossipWith(final ClusterMember member) {
 			ChannelFuture future = clientBootstrap.connect(new InetSocketAddress(member.getIp(),member.getPort()));
 			future.addListener(new ChannelFutureListener() {
 				
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {
 					if(future.isSuccess()) {
-						future.getChannel().write(cluster.generateMessage());
+						future.getChannel().write(cluster.createGossipMessage());
 					}
 				}
 			});

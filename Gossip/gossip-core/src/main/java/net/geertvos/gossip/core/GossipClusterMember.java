@@ -11,15 +11,17 @@ public class GossipClusterMember implements ClusterMember {
 	private String ip;
 	private int port;
 	private long lastSeenOnline;
+	private String hash;
 
 	public GossipClusterMember() {
 	}
 	
-	public GossipClusterMember(String id, String ip, int port, long lastSeenOnline) {
+	public GossipClusterMember(String id, String ip, int port, long lastSeenOnline, String hash) {
 		this.id = id;
 		this.ip = ip;
 		this.port = port;
 		this.lastSeenOnline = lastSeenOnline;
+		this.hash = hash;
 	}
 
 
@@ -53,6 +55,10 @@ public class GossipClusterMember implements ClusterMember {
 
 	public void setPort(int port) {
 		this.port = port;
+	}
+	
+	public String getHash() {
+		return hash;
 	}
 
 	public void setLastSeenOnline(long lastSeenOnline) {

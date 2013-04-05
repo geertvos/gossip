@@ -38,7 +38,7 @@ public class GossipClusterTest {
 		
 		GossipMessage gossipMessage2 = new GossipMessage();
 		List<GossipClusterMember> members2 = new ArrayList<GossipClusterMember>();
-		GossipClusterMember m3 = new GossipClusterMember("offline","ip",8888,System.currentTimeMillis()-10);
+		GossipClusterMember m3 = new GossipClusterMember("offline","ip",8888,System.currentTimeMillis()-10,"");
 		members2.add(m3);
 		gossipMessage2.setMemberInfo(members2);
 

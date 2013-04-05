@@ -12,6 +12,6 @@ public interface ClusterEventListener {
 	
 	public void onClusterStabalized();
 	
-	public void onClusterDestabalized();
+	public void onClusterDestabilized();
 	
 }
