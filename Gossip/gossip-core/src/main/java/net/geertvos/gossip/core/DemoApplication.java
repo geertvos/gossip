@@ -1,59 +1,31 @@
 package net.geertvos.gossip.core;
 
-import org.apache.log4j.BasicConfigurator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import net.geertvos.gossip.api.cluster.ClusterEventListener;
-import net.geertvos.gossip.api.cluster.ClusterMember;
 import net.geertvos.gossip.core.network.GossipServer;
+
+import org.apache.log4j.BasicConfigurator;
 
 public class DemoApplication {
 
 	public static void main(String[] args) {
 		BasicConfigurator.configure();
 		
-		GossipClusterMember member1 = new GossipClusterMember("1", "localhost", 8002, System.currentTimeMillis(),"");
-		GossipClusterMember member2 = new GossipClusterMember("2", "localhost", 8002, System.currentTimeMillis(),"");
-		GossipCluster cluster1 = new GossipCluster("1", "localhost", 8001, member2 );
-		GossipCluster cluster2 = new GossipCluster("2", "localhost", 8002, member1 );
+		Random random = new Random(System.currentTimeMillis());
+		List<GossipClusterMember> members = new ArrayList<GossipClusterMember>();
+		for(int i=0; i<10; i++) {
+			GossipClusterMember member = new GossipClusterMember(""+i, "localhost", 8000+i, System.currentTimeMillis(),"");
+			members.add(member);
+		}
+		for(int i=0; i<10; i++) {
+			GossipClusterMember member = members.get(random.nextInt(members.size()));
+			GossipCluster cluster = new GossipCluster(""+i, "localhost", 8000+i, member );
 
-		cluster1.registerClusterEventListener(new ClusterEventListener() {
-			
-			@Override
-			public void onNewInactiveMember(ClusterMember member) {
-				System.out.println("New inactive member: "+member.getId());
-			}
-			
-			@Override
-			public void onNewActiveMember(ClusterMember member) {
-				System.out.println("New active member: "+member.getId());
-			}
-			
-			@Override
-			public void onMemberDeactivated(ClusterMember member) {
-				System.out.println("Deactivated member: "+member.getId());
-			}
-			
-			@Override
-			public void onMemberActivated(ClusterMember member) {
-				System.out.println("Activated member: "+member.getId());
-			}
-			
-			@Override
-			public void onClusterStabalized() {
-				System.out.println("Stabilized");
-			}
-			
-			@Override
-			public void onClusterDestabilized() {
-				System.out.println("Destabilized");
-			}
-		});
-		
-		GossipServer server1 = new GossipServer(cluster1);
-		server1.start();
-		
-		GossipServer server2 = new GossipServer(cluster2);
-		server2.start();
+			GossipServer server1 = new GossipServer(cluster);
+			server1.start();
+		}
 		
 	}
 	
