@@ -27,7 +27,7 @@ public class GossipCluster implements Cluster {
 	private AtomicReference<ClusterState> clusterState = new AtomicReference<ClusterState>(ClusterState.UNSTABLE);
 	private List<ClusterEventListener> listeners = new ArrayList<ClusterEventListener>(10);
 	
-	private ClusterHashProvider hashProvider = new Md5HashProvider();
+	private ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
 	private String clusterStateHash = "";
 	
 	private volatile boolean running = true;
@@ -102,8 +102,10 @@ public class GossipCluster implements Cluster {
 	private GossipMessage generateMessage() {
 		GossipMessage reply = new GossipMessage();
 		List<GossipClusterMember> members = new ArrayList<GossipClusterMember>(activeMembers.values());
-		members.add(new GossipClusterMember(id, host, port, System.currentTimeMillis(), clusterStateHash));
-		clusterStateHash = hashProvider.hashCluster((Collection)members);
+		GossipClusterMember me = new GossipClusterMember(id, host, port, System.currentTimeMillis(), clusterStateHash);
+		members.add(me);
+		clusterStateHash = hashProvider.hashCluster(members);
+		me.setHash(clusterStateHash);
 		reply.setMemberInfo(members);
 		return reply;
 	}

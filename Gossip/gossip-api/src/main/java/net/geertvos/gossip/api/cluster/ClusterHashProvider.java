@@ -3,8 +3,8 @@ package net.geertvos.gossip.api.cluster;
 import java.util.Collection;
 
 
-public interface ClusterHashProvider {
+public interface ClusterHashProvider<T extends ClusterMember> {
 
-	String hashCluster(Collection<ClusterMember> members);
+	String hashCluster(Collection<T> members);
 	
 }

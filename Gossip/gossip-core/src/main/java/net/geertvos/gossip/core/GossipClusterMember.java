@@ -60,6 +60,10 @@ public class GossipClusterMember implements ClusterMember {
 	public String getHash() {
 		return hash;
 	}
+	
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
 
 	public void setLastSeenOnline(long lastSeenOnline) {
 		this.lastSeenOnline = lastSeenOnline;

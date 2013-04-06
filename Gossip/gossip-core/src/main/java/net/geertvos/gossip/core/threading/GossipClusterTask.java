@@ -3,10 +3,9 @@ package net.geertvos.gossip.core.threading;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
+public abstract class GossipClusterTask<T> implements Callable<T>, Runnable {
 
-public abstract class GossipClusterTask<T> implements Callable, Runnable {
-
-	private CountDownLatch latch = new CountDownLatch(1);
+	private final CountDownLatch latch = new CountDownLatch(1);
 	private T result = null;
 
 	@Override

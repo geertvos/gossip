@@ -35,7 +35,7 @@ public class GossipMessageHandler extends SimpleChannelHandler {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
 		if(e.getCause() instanceof IOException) {
-			//ignore
+			//ignore for now, we need to handle failed connections later.
 		} else {
 			e.getCause().printStackTrace();
 		}
