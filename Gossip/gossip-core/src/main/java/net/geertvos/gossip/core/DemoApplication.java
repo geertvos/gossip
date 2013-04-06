@@ -1,5 +1,7 @@
 package net.geertvos.gossip.core;
 
+import org.apache.log4j.BasicConfigurator;
+
 import net.geertvos.gossip.api.cluster.ClusterEventListener;
 import net.geertvos.gossip.api.cluster.ClusterMember;
 import net.geertvos.gossip.core.network.GossipServer;
@@ -7,6 +9,7 @@ import net.geertvos.gossip.core.network.GossipServer;
 public class DemoApplication {
 
 	public static void main(String[] args) {
+		BasicConfigurator.configure();
 		
 		GossipClusterMember member1 = new GossipClusterMember("1", "localhost", 8002, System.currentTimeMillis(),"");
 		GossipClusterMember member2 = new GossipClusterMember("2", "localhost", 8002, System.currentTimeMillis(),"");
@@ -17,12 +20,12 @@ public class DemoApplication {
 			
 			@Override
 			public void onNewInactiveMember(ClusterMember member) {
-				System.out.println("Mew inactive member: "+member.getId());
+				System.out.println("New inactive member: "+member.getId());
 			}
 			
 			@Override
 			public void onNewActiveMember(ClusterMember member) {
-				System.out.println("Mew active member: "+member.getId());
+				System.out.println("New active member: "+member.getId());
 			}
 			
 			@Override

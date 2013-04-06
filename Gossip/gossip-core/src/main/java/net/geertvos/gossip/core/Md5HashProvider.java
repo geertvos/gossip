@@ -9,6 +9,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.codec.Charsets;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import net.geertvos.gossip.api.cluster.Cluster;
 import net.geertvos.gossip.api.cluster.ClusterHashProvider;
 import net.geertvos.gossip.api.cluster.ClusterMember;
@@ -16,16 +20,10 @@ import net.geertvos.gossip.api.cluster.ClusterMember;
 public class Md5HashProvider implements ClusterHashProvider {
 
 	private final ClusterMemberComperator comperator = new ClusterMemberComperator();
-	private final MessageDigest digest;
-	private final Charset charset;
+	private final MessageDigest digester = DigestUtils.getMd5Digest();
+	private final Charset charset = Charsets.UTF_8;
 	
 	public Md5HashProvider() {
-		try { 
-			digest = MessageDigest.getInstance("MD5");
-			charset = Charset.forName("UTF-8");
-		} catch(Exception e) {
-			throw new IllegalStateException("Unable to instantiate digest or charset.",e);
-		}
 	}
 	
 	public class ClusterMemberComperator implements Comparator<ClusterMember> {
@@ -39,15 +37,18 @@ public class Md5HashProvider implements ClusterHashProvider {
 
 	@Override
 	public String hashCluster(Collection<ClusterMember> members) {
-		List<ClusterMember> sortedMembers = new ArrayList(members);
+		List<ClusterMember> sortedMembers = new ArrayList<ClusterMember>(members);
 		Collections.sort(sortedMembers, comperator);
 		
-		StringBuilder string = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		for(ClusterMember member : sortedMembers) {
-			string.append(member.getId()+"|");
+			stringBuilder.append(member.getId()+"|");
 		}
 		
-		return new String(digest.digest(string.toString().getBytes(charset)), charset);
+		byte[] bytes = stringBuilder.toString().getBytes(charset);
+		byte[] digest = digester.digest(bytes);
+		byte[] encoded = Base64.encodeBase64(digest);
+		return new String(encoded, charset);
 	}
 	
 }

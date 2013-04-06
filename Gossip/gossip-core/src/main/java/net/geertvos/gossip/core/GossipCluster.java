@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.log4j.Logger;
+
 import net.geertvos.gossip.api.cluster.Cluster;
 import net.geertvos.gossip.api.cluster.ClusterEventListener;
 import net.geertvos.gossip.api.cluster.ClusterHashProvider;
@@ -16,6 +18,8 @@ import net.geertvos.gossip.core.threading.GossipClusterTask;
 
 public class GossipCluster implements Cluster {
 
+	private final Logger logger = Logger.getLogger(GossipCluster.class);
+	
 	private static final int DEADNODE_DELAY = 2000;
 	
 	private LinkedHashMap<String,GossipClusterMember> activeMembers = new LinkedHashMap<String, GossipClusterMember>();
@@ -198,14 +202,19 @@ public class GossipCluster implements Cluster {
 			for(GossipClusterMember member : activeMembers.values()) {
 				if(!member.getHash().equals(clusterStateHash)) {
 					stable = false;
+					if(logger.isDebugEnabled()) {
+						logger.debug("Cluster not stable, "+member.getId()+" has a different view.");
+					}
 				}
 			}
 			if(clusterState.get().equals(ClusterState.UNSTABLE) && stable) {
 				clusterState.set(ClusterState.STABLE);
+				logger.info("Cluster view stabilized.");
 				notifyStable(true);
 			}
 			else if(clusterState.get().equals(ClusterState.STABLE) && !stable) {
 				clusterState.set(ClusterState.UNSTABLE);
+				logger.info("Cluster view destabilized.");
 				notifyStable(false);
 			}
 		}
