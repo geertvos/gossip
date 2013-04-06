@@ -18,12 +18,14 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 public class GossipServer {
 
-	private ClientBootstrap clientBootstrap;
+	private static final int GOSSIP_INTERVAL = 500;
+
 	private final GossipCluster cluster;
 	
 	private volatile boolean running = true;
-	private Channel serverChannel;
 	private ServerBootstrap serverBootstrap;
+	private ClientBootstrap clientBootstrap;
+	private Channel serverChannel;
 	
 	public GossipServer(GossipCluster cluster) {
 		this.cluster = cluster;
@@ -58,7 +60,7 @@ public class GossipServer {
 			while(running) {
 				randomGossip();
 				try {
-					Thread.sleep(500);
+					Thread.sleep(GOSSIP_INTERVAL);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
