@@ -44,7 +44,7 @@ public class GossipCluster implements Cluster {
 			passiveMembers.put(member.getId(), member);
 		}
 		
-		Thread worker = new Thread(new Worker());
+		Thread worker = new Thread(new Worker(),"GossipCluster worker");
 		worker.start();
 	}
 	
