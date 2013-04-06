@@ -1,13 +1,10 @@
 package net.geertvos.gossip.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.apache.log4j.Logger;
 
 import net.geertvos.gossip.api.cluster.Cluster;
 import net.geertvos.gossip.api.cluster.ClusterEventListener;
@@ -15,6 +12,8 @@ import net.geertvos.gossip.api.cluster.ClusterHashProvider;
 import net.geertvos.gossip.api.cluster.ClusterMember;
 import net.geertvos.gossip.api.cluster.ClusterState;
 import net.geertvos.gossip.core.threading.GossipClusterTask;
+
+import org.apache.log4j.Logger;
 
 public class GossipCluster implements Cluster {
 
