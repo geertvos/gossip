@@ -20,17 +20,16 @@ public class GossipCluster implements Cluster {
 	
 	private static final int DEADNODE_DELAY = 5000;
 	
-	private LinkedHashMap<String,GossipClusterMember> activeMembers = new LinkedHashMap<String, GossipClusterMember>();
-	private LinkedHashMap<String,GossipClusterMember> passiveMembers = new LinkedHashMap<String, GossipClusterMember>();
-	private ClusterState clusterState = ClusterState.UNSTABLE;
-	private List<ClusterEventListener> listeners = new ArrayList<ClusterEventListener>(10);
-	
-	private ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
-	private String clusterStateHash = "";
+	private final LinkedHashMap<String,GossipClusterMember> activeMembers = new LinkedHashMap<String, GossipClusterMember>();
+	private final LinkedHashMap<String,GossipClusterMember> passiveMembers = new LinkedHashMap<String, GossipClusterMember>();
+	private final List<ClusterEventListener> listeners = new ArrayList<ClusterEventListener>(10);
+	private final ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
+	private final LinkedBlockingQueue<Runnable> tasks = new LinkedBlockingQueue<Runnable>();
 	
 	private volatile boolean running = true;
-	private final LinkedBlockingQueue<Runnable> tasks = new LinkedBlockingQueue<Runnable>();
 
+	private ClusterState clusterState = ClusterState.UNSTABLE;
+	private String clusterStateHash = "";
 	private final String id;
 	private final String host;
 	private final int port;
@@ -39,11 +38,9 @@ public class GossipCluster implements Cluster {
 		this.id = id;
 		this.host = host;
 		this.port = port;
-		this.hashProvider = new Md5HashProvider();
 		for(GossipClusterMember member : members) {
 			passiveMembers.put(member.getId(), member);
 		}
-		
 		Thread worker = new Thread(new Worker(),"GossipCluster worker");
 		worker.start();
 	}
