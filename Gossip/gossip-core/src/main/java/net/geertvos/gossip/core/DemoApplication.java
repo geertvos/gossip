@@ -15,11 +15,12 @@ public class DemoApplication {
 		
 		Random random = new Random(System.currentTimeMillis());
 		List<GossipClusterMember> members = new ArrayList<GossipClusterMember>();
-		for(int i=0; i<10; i++) {
+		int numberOfHosts = 10;
+		for(int i=0; i < numberOfHosts; i++) {
 			GossipClusterMember member = new GossipClusterMember(""+i, "localhost", 8000+i, System.currentTimeMillis(),"");
 			members.add(member);
 		}
-		for(int i=0; i<10; i++) {
+		for(int i=0; i < numberOfHosts; i++) {
 			GossipClusterMember member = members.get(random.nextInt(members.size()));
 			GossipCluster cluster = new GossipCluster(""+i, "localhost", 8000+i, member );
 
