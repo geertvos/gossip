@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicReference;
 
 import net.geertvos.gossip.api.cluster.Cluster;
 import net.geertvos.gossip.api.cluster.ClusterEventListener;
@@ -23,7 +22,7 @@ public class GossipCluster implements Cluster {
 	
 	private LinkedHashMap<String,GossipClusterMember> activeMembers = new LinkedHashMap<String, GossipClusterMember>();
 	private LinkedHashMap<String,GossipClusterMember> passiveMembers = new LinkedHashMap<String, GossipClusterMember>();
-	private AtomicReference<ClusterState> clusterState = new AtomicReference<ClusterState>(ClusterState.UNSTABLE);
+	private ClusterState clusterState = ClusterState.UNSTABLE;
 	private List<ClusterEventListener> listeners = new ArrayList<ClusterEventListener>(10);
 	
 	private ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
@@ -70,7 +69,7 @@ public class GossipCluster implements Cluster {
 
 	@Override
 	public ClusterState getState() {
-		return clusterState.get();
+		return clusterState;
 	}
 
 	@Override
@@ -208,13 +207,13 @@ public class GossipCluster implements Cluster {
 					}
 				}
 			}
-			if(clusterState.get().equals(ClusterState.UNSTABLE) && stable) {
-				clusterState.set(ClusterState.STABLE);
+			if(clusterState.equals(ClusterState.UNSTABLE) && stable) {
+				clusterState = ClusterState.STABLE;
 				logger.info("Cluster view stabilized.");
 				notifyStable(true);
 			}
-			else if(clusterState.get().equals(ClusterState.STABLE) && !stable) {
-				clusterState.set(ClusterState.UNSTABLE);
+			else if(clusterState.equals(ClusterState.STABLE) && !stable) {
+				clusterState = ClusterState.UNSTABLE;
 				logger.info("Cluster view destabilized.");
 				notifyStable(false);
 			}
