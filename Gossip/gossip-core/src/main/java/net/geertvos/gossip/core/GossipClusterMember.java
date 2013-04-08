@@ -24,6 +24,9 @@ public class GossipClusterMember implements ClusterMember {
 		this.hash = hash;
 	}
 
+	public GossipClusterMember(String id, String ip, int port, long lastSeenOnline) {
+		this(id,ip,port,lastSeenOnline,"");
+	}
 
 	@Override
 	public String getId() {
