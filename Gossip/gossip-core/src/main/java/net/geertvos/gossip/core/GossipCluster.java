@@ -47,7 +47,7 @@ public class GossipCluster implements Cluster {
 		for(GossipClusterMember member : members) {
 			passiveMembers.put(member.getId(), member);
 		}
-		scheduledExecutorService.scheduleWithFixedDelay(new CheckStabilityPeriodicaly(), 1000, 1000, TimeUnit.MILLISECONDS);
+		scheduledExecutorService.scheduleWithFixedDelay(new CheckStabilityPeriodicaly(), 5000, 1000, TimeUnit.MILLISECONDS);
 	}
 	
 	@Override
