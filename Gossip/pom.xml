@@ -20,10 +20,6 @@
 		<log4j.version>1.2.17</log4j.version>
 	</properties>
 
-
-	<repositories>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -35,7 +31,6 @@
 			<artifactId>mockito-all</artifactId>
 			<version>${mockito.version}</version>
 		</dependency>
-            
 	</dependencies>
 
 	<build>

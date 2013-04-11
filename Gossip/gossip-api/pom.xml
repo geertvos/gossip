@@ -15,18 +15,4 @@
 	<name>gossip-api</name>
 	<url>http://maven.apache.org</url>
 
-	<properties>
-	</properties>
-
-	<repositories>
-
-	</repositories>
-
-	<dependencies>
-	</dependencies>
-	<build>
-		<plugins>
-		</plugins>
-	</build>
-
 </project>
