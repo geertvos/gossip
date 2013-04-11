@@ -18,7 +18,7 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 public class GossipServer {
 
-	private static final int GOSSIP_INTERVAL = 500;
+	private int gossipInterval = 500;
 
 	private final GossipCluster cluster;
 	
@@ -27,6 +27,10 @@ public class GossipServer {
 	private ClientBootstrap clientBootstrap;
 	private Channel serverChannel;
 	
+	/**
+	 * Create a server for this cluster.
+	 * @param cluster
+	 */
 	public GossipServer(GossipCluster cluster) {
 		this.cluster = cluster;
 		
@@ -38,14 +42,28 @@ public class GossipServer {
 		
 	}
 	
-	public void start() {
-		serverChannel = serverBootstrap.bind(new InetSocketAddress(cluster.getHost(), cluster.getPort()));
-
-		Thread runner = new Thread(new RandomGossip(),"GossipServer Thread");
-		runner.start();
-		
+	/**
+	 * Set the gossip interval. Default is 500 ms. Set this value to low and the cluster will use a lot of network bandwidth and CPU.
+	 * Set it too high, and the it will take a while for the cluster to 'discover' nodes and failures.
+	 * 
+	 * @param intervalInMs
+	 */
+	public void setGossipInterval(int intervalInMs) {
+		this.gossipInterval = intervalInMs;
 	}
 	
+	/**
+	 * Starts the server for this cluster.
+	 */
+	public void start() {
+		serverChannel = serverBootstrap.bind(new InetSocketAddress(cluster.getHost(), cluster.getPort()));
+		Thread runner = new Thread(new RandomGossip(),"GossipServer Thread");
+		runner.start();
+	}
+	
+	/**
+	 * Stop the server for this cluster.
+	 */
 	public void shutdown() {
 		running = false;
 		serverChannel.close();
@@ -60,7 +78,7 @@ public class GossipServer {
 			while(running) {
 				randomGossip();
 				try {
-					Thread.sleep(GOSSIP_INTERVAL);
+					Thread.sleep(gossipInterval);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -86,7 +104,7 @@ public class GossipServer {
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {
 					if(future.isSuccess()) {
-						future.getChannel().write(cluster.createGossipMessage());
+						future.getChannel().write(cluster.createGossipMessage(member));
 					}
 				}
 			});

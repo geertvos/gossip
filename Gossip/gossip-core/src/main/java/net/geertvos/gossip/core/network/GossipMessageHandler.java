@@ -26,9 +26,13 @@ public class GossipMessageHandler extends SimpleChannelHandler {
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		GossipMessage message = (GossipMessage) e.getMessage();
 		GossipMessage reply = cluster.handleGossip(message);
-		ChannelFuture future = ctx.getChannel().write(reply);
-		if(disconnect) {
-			future.addListener(ChannelFutureListener.CLOSE);
+		if(reply != null) {
+			ChannelFuture future = ctx.getChannel().write(reply);
+			if(disconnect) {
+				future.addListener(ChannelFutureListener.CLOSE);
+			}
+		} else {
+			ctx.getChannel().close();
 		}
 	}
 

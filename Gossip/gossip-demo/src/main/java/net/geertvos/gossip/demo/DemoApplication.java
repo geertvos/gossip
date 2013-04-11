@@ -12,8 +12,9 @@ import org.apache.log4j.BasicConfigurator;
 
 public class DemoApplication {
 
+	private static final String CLUSTER = "demoCluster";
 	private static final String HOST = "localhost";
-	private static final int HOST_COUNT = 10;
+	private static final int HOST_COUNT = 30;
 
 	
 	public static void main(String[] args) {
@@ -27,7 +28,7 @@ public class DemoApplication {
 		}
 		for(int i=0; i < HOST_COUNT; i++) {
 			GossipClusterMember member = members.get(random.nextInt(members.size()));
-			GossipCluster cluster = new GossipCluster(generateId(i), HOST, 8000+i, member );
+			GossipCluster cluster = new GossipCluster(CLUSTER, generateId(i), HOST, 8000+i, member );
 
 			GossipServer server1 = new GossipServer(cluster);
 			server1.start();

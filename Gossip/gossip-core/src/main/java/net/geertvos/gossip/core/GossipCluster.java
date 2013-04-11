@@ -27,23 +27,24 @@ public class GossipCluster implements Cluster {
 	private final LinkedHashMap<String,GossipClusterMember> activeMembers = new LinkedHashMap<String, GossipClusterMember>();
 	private final LinkedHashMap<String,GossipClusterMember> passiveMembers = new LinkedHashMap<String, GossipClusterMember>();
 	private final List<ClusterEventListener> listeners = new ArrayList<ClusterEventListener>(10);
-
 	private final ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
-	
 	private final ScheduledThreadPoolExecutor scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
-	private ExecutorService executorService;
+
+	private final String clusterId;
 	
+	private ExecutorService executorService;
 	private ClusterState clusterState = ClusterState.UNSTABLE;
 	private String clusterStateHash = "";
-	private final String id;
+	private final String memberId;
 	private final String host;
 	private final int port;
 	
-	public GossipCluster(String id, String host, int port, GossipClusterMember ... members) {
-		this.id = id;
+	public GossipCluster(String clusterId, String memberId, String host, int port, GossipClusterMember ... members) {
+		this.clusterId = clusterId;
+		this.memberId = memberId;
 		this.host = host;
 		this.port = port;
-		this.executorService = Executors.newSingleThreadExecutor(new NamedThreadFactory("Gossip Cluster "+id));
+		this.executorService = Executors.newSingleThreadExecutor(new NamedThreadFactory("Gossip Cluster "+memberId));
 		for(GossipClusterMember member : members) {
 			passiveMembers.put(member.getId(), member);
 		}
@@ -80,13 +81,22 @@ public class GossipCluster implements Cluster {
 	}
 	
 	public GossipMessage handleGossip(GossipMessage message) {
-		HandleGossipMessage task = new HandleGossipMessage(message);
-		executorService.execute(task);
-		return task.call();
+		if(message.getCluster().equals(clusterId)) {
+			if( message.getTo().equals(memberId) ) {
+				HandleGossipMessage task = new HandleGossipMessage(message);
+				executorService.execute(task);
+				return task.call();
+			} else {
+				logger.error("Got a gossip message that was intended for someone else: "+message.getTo());
+			}
+		} else {
+			logger.error("Got a gossip message that was intended for another cluster: "+message.getCluster());
+		}
+		return null;
 	}
 
-	public GossipMessage createGossipMessage() {
-		GenerateMessageTask task = new GenerateMessageTask();
+	public GossipMessage createGossipMessage(ClusterMember to) {
+		GenerateMessageTask task = new GenerateMessageTask(to);
 		executorService.execute(task);
 		return task.call();
 	}
@@ -99,10 +109,10 @@ public class GossipCluster implements Cluster {
 		return port;
 	}
 	
-	private GossipMessage generateMessage() {
-		GossipMessage reply = new GossipMessage();
+	private GossipMessage generateMessage(ClusterMember to) {
+		GossipMessage reply = new GossipMessage(clusterId, memberId, to.getId());
 		List<GossipClusterMember> members = new ArrayList<GossipClusterMember>(activeMembers.values());
-		GossipClusterMember me = new GossipClusterMember(id, host, port, System.currentTimeMillis(), clusterStateHash);
+		GossipClusterMember me = new GossipClusterMember(memberId, host, port, System.currentTimeMillis(), clusterStateHash);
 		members.add(me);
 		clusterStateHash = hashProvider.hashCluster(members);
 		me.setHash(clusterStateHash);
@@ -188,7 +198,7 @@ public class GossipCluster implements Cluster {
 			public void run() {
 				if(stable) {
 					for(ClusterEventListener listener : listeners) {
-						listener.onClusterStabalized();
+						listener.onClusterStabilized();
 					}
 				} else {
 					for(ClusterEventListener listener : listeners) {
@@ -222,9 +232,15 @@ public class GossipCluster implements Cluster {
 
 	class GenerateMessageTask extends GossipClusterTask<GossipMessage> {
 
+		private final ClusterMember to;
+
+		public GenerateMessageTask(ClusterMember to) {
+			this.to = to;
+		}
+		
 		@Override
 		public void run() {
-			setResult(generateMessage());
+			setResult(generateMessage(to));
 		}
 		
 	}
@@ -297,7 +313,7 @@ public class GossipCluster implements Cluster {
 		@Override
 		public void run() {
 			for(GossipClusterMember member : message.getMemberInfo()) {
-				if(member.getId().equals(id)) {
+				if(member.getId().equals(memberId)) {
 					//Skip self
 					continue;
 				}
@@ -341,7 +357,7 @@ public class GossipCluster implements Cluster {
 					}
 				}
 			}
-			setResult(generateMessage());
+			setResult(generateMessage(activeMembers.get(message.getFrom())));
 			checkStability();
 		}
 
