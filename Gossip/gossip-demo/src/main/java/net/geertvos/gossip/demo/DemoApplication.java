@@ -14,7 +14,7 @@ public class DemoApplication {
 
 	private static final String CLUSTER = "demoCluster";
 	private static final String HOST = "localhost";
-	private static final int HOST_COUNT = 30;
+	private static final int HOST_COUNT = 10;
 
 	
 	public static void main(String[] args) {
