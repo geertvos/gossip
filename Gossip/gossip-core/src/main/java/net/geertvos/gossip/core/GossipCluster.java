@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.geertvos.gossip.api.cluster.Cluster;
 import net.geertvos.gossip.api.cluster.ClusterEventListener;
+import net.geertvos.gossip.api.cluster.ClusterEventService;
 import net.geertvos.gossip.api.cluster.ClusterHashProvider;
 import net.geertvos.gossip.api.cluster.ClusterMember;
 import net.geertvos.gossip.api.cluster.ClusterState;
@@ -45,10 +46,9 @@ public class GossipCluster implements Cluster {
 	
 	private final LinkedHashMap<String,GossipClusterMember> activeMembers = new LinkedHashMap<String, GossipClusterMember>();
 	private final LinkedHashMap<String,GossipClusterMember> passiveMembers = new LinkedHashMap<String, GossipClusterMember>();
-	private final List<ClusterEventListener> listeners = new ArrayList<ClusterEventListener>(10);
 	private final ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
 	private final ScheduledThreadPoolExecutor scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
-
+	private final ClusterEventService eventService = new GossipClusterEventService();
 	private final String clusterId;
 	
 	private ExecutorService executorService;
@@ -65,6 +65,9 @@ public class GossipCluster implements Cluster {
 		this.port = port;
 		this.executorService = Executors.newSingleThreadExecutor(new NamedThreadFactory("Gossip Cluster "+memberId));
 		for(GossipClusterMember member : members) {
+			if(member.getId().equals(memberId)) {
+				throw new IllegalStateException("Cannot add self to cluster.");
+			}
 			passiveMembers.put(member.getId(), member);
 		}
 		scheduledExecutorService.scheduleWithFixedDelay(new CheckStabilityPeriodicaly(), 5000, 1000, TimeUnit.MILLISECONDS);
@@ -96,7 +99,12 @@ public class GossipCluster implements Cluster {
 
 	@Override
 	public void registerClusterEventListener(ClusterEventListener listener) {
-		listeners.add(listener);
+		eventService.registerListener(listener);
+	}
+	
+	@Override
+	public void unregisterClusterEventListener(ClusterEventListener listener) {
+		eventService.unregisterListener(listener);
 	}
 	
 	public GossipMessage handleGossip(GossipMessage message) {
@@ -115,6 +123,9 @@ public class GossipCluster implements Cluster {
 	}
 
 	public GossipMessage createGossipMessage(ClusterMember to) {
+		if(to.getId().equals(memberId)) {
+			logger.error("Sending a message to myself? Why?");
+		}
 		GenerateMessageTask task = new GenerateMessageTask(to);
 		executorService.execute(task);
 		return task.call();
@@ -151,82 +162,32 @@ public class GossipCluster implements Cluster {
 	
 	public void notifyNewInactive(final GossipClusterMember member) {
 		logger.debug("New inactive member "+member.getId());
-		Runnable task = new Runnable() {
-			
-			@Override
-			public void run() {
-				for(ClusterEventListener listener : listeners) {
-					listener.onNewInactiveMember(member);
-				}
-			}
-		};
-		executorService.execute(task);
+		eventService.notifyNewInactiveMember(member);
 	}
 	
 	public void notifyNewActive(final GossipClusterMember member) {
 		logger.debug("New active member "+member.getId());
-		Runnable task = new Runnable() {
-			
-			@Override
-			public void run() {
-				for(ClusterEventListener listener : listeners) {
-					listener.onNewInactiveMember(member);
-				}
-			}
-		};
-		executorService.execute(task);
+		eventService.notifyNewActiveMember(member);
 	}
 	
 	public void notifyMemberDeactivated(final GossipClusterMember member) {
 		logger.debug("Deactivated member "+member.getId());
-		Runnable task = new Runnable() {
-			
-			@Override
-			public void run() {
-				for(ClusterEventListener listener : listeners) {
-					listener.onMemberDeactivated(member);
-				}
-			}
-		};
-		executorService.execute(task);
+		eventService.notifyMemberDeactivated(member);
 	}
 	
 	public void notifyMemberActivated(final GossipClusterMember member) {
 		logger.debug("Activated member "+member.getId());
-		Runnable task = new Runnable() {
-			
-			@Override
-			public void run() {
-				for(ClusterEventListener listener : listeners) {
-					listener.onMemberActivated(member);
-				}
-			}
-		};
-		executorService.execute(task);
+		eventService.notifyMemberActivated(member);
 	}
 	
 	public void notifyStable(final boolean stable) {
 		if(stable) {
 			logger.debug("Cluster view stable");
+			eventService.notifyClusterStabilized();
 		} else {
 			logger.debug("Cluster view unstable");
+			eventService.notifyClusterDestabilized();
 		}
-		Runnable task = new Runnable() {
-			
-			@Override
-			public void run() {
-				if(stable) {
-					for(ClusterEventListener listener : listeners) {
-						listener.onClusterStabilized();
-					}
-				} else {
-					for(ClusterEventListener listener : listeners) {
-						listener.onClusterDestabilized();
-					}
-				}
-			}
-		};
-		executorService.execute(task);
 	}
 
 
@@ -383,5 +344,5 @@ public class GossipCluster implements Cluster {
 
 		
 	}
-	
+
 }

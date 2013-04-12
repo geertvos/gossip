@@ -33,4 +33,7 @@ public interface Cluster {
 	
 	public void registerClusterEventListener(ClusterEventListener listener);
 	
+	public void unregisterClusterEventListener(ClusterEventListener listener);
+
+	
 }

@@ -27,7 +27,11 @@ public class DemoApplication {
 			members.add(member);
 		}
 		for(int i=0; i < HOST_COUNT; i++) {
-			GossipClusterMember member = members.get(random.nextInt(members.size()));
+			int randomMember = random.nextInt(members.size());
+			while(randomMember == i) {
+				randomMember = random.nextInt(members.size());
+			}
+			GossipClusterMember member = members.get(randomMember);
 			GossipCluster cluster = new GossipCluster(CLUSTER, generateId(i), HOST, 8000+i, member );
 
 			GossipServer server1 = new GossipServer(cluster);
