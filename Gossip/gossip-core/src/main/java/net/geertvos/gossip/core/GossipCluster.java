@@ -25,7 +25,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import net.geertvos.gossip.api.cluster.Cluster;
-import net.geertvos.gossip.api.cluster.ClusterEventListener;
 import net.geertvos.gossip.api.cluster.ClusterEventService;
 import net.geertvos.gossip.api.cluster.ClusterHashProvider;
 import net.geertvos.gossip.api.cluster.ClusterMember;
@@ -48,9 +47,9 @@ public class GossipCluster implements Cluster {
 	private final LinkedHashMap<String,GossipClusterMember> passiveMembers = new LinkedHashMap<String, GossipClusterMember>();
 	private final ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
 	private final ScheduledThreadPoolExecutor scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
-	private final ClusterEventService eventService = new GossipClusterEventService();
 	private final String clusterId;
 	
+	private ClusterEventService eventService = new GossipClusterEventService();
 	private ExecutorService executorService;
 	private ClusterState clusterState = ClusterState.UNSTABLE;
 	private String clusterStateHash = "";
@@ -98,15 +97,15 @@ public class GossipCluster implements Cluster {
 	}
 
 	@Override
-	public void registerClusterEventListener(ClusterEventListener listener) {
-		eventService.registerListener(listener);
+	public void setEventService(ClusterEventService service) {
+		this.eventService = service;
 	}
 	
 	@Override
-	public void unregisterClusterEventListener(ClusterEventListener listener) {
-		eventService.unregisterListener(listener);
+	public ClusterEventService getEventService() {
+		return eventService;
 	}
-	
+
 	public GossipMessage handleGossip(GossipMessage message) {
 		if(message.getCluster().equals(clusterId)) {
 			if( message.getTo().equals(memberId) ) {

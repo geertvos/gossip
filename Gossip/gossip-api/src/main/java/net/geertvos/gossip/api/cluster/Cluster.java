@@ -31,9 +31,8 @@ public interface Cluster {
 	
 	public ClusterState getState();
 	
-	public void registerClusterEventListener(ClusterEventListener listener);
+	public void setEventService(ClusterEventService service);
 	
-	public void unregisterClusterEventListener(ClusterEventListener listener);
-
+	public ClusterEventService getEventService();
 	
 }
