@@ -146,7 +146,7 @@ public class GossipCluster implements Cluster {
 		List<GossipClusterMember> members = new ArrayList<GossipClusterMember>(activeMembers.values());
 		GossipClusterMember me = new GossipClusterMember(memberId, host, port, System.currentTimeMillis(), clusterStateHash);
 		members.add(me);
-		clusterStateHash = hashProvider.hashCluster(members);
+//		clusterStateHash = hashProvider.hashCluster(members);
 		me.setHash(clusterStateHash);
 		reply.setMemberInfo(members);
 		return reply;
@@ -244,7 +244,16 @@ public class GossipCluster implements Cluster {
 
 		@Override
 		public void run() {
+			List<GossipClusterMember> members = new ArrayList<GossipClusterMember>(activeMembers.values());
+			GossipClusterMember me = new GossipClusterMember(memberId, host, port, System.currentTimeMillis(), clusterStateHash);
+			members.add(me);
+			String clusterStateHash2 = hashProvider.hashCluster(members);
 			boolean stable = true;
+			if(!clusterStateHash2.equals(clusterStateHash)) {
+				stable = false;
+			}
+			clusterStateHash = clusterStateHash2;
+			
 			for(GossipClusterMember member : activeMembers.values()) {
 				if(!member.getHash().equals(clusterStateHash)) {
 					stable = false;
