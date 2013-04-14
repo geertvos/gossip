@@ -18,6 +18,7 @@ package net.geertvos.gossip.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +50,7 @@ public class GossipCluster implements Cluster {
 	private final ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
 	private final ScheduledThreadPoolExecutor scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
 	private final String clusterId;
+	private final ClusterMemberComperator<ClusterMember> memberComperator = new ClusterMemberComperator<ClusterMember>();
 	
 	private ClusterEventService eventService = new GossipClusterEventService();
 	private ExecutorService executorService;
@@ -57,7 +59,7 @@ public class GossipCluster implements Cluster {
 	private final String memberId;
 	private final String host;
 	private final int port;
-	
+
 	public GossipCluster(String clusterId, String memberId, String host, int port, GossipClusterMember ... members) {
 		this.clusterId = clusterId;
 		this.memberId = memberId;
@@ -184,6 +186,8 @@ public class GossipCluster implements Cluster {
 		if(stable) {
 			logger.debug("Cluster view stable");
 			List<ClusterMember> members = new ArrayList<ClusterMember>(activeMembers.values());
+			members.add(getLocalMember());
+			Collections.sort(members, memberComperator);
 			List<ClusterMember> unmodifieable = Collections.unmodifiableList(members);
 			eventService.notifyClusterStabilized(unmodifieable);
 		} else {
@@ -345,6 +349,11 @@ public class GossipCluster implements Cluster {
 
 
 		
+	}
+
+	@Override
+	public ClusterMember getLocalMember() {
+		return new GossipClusterMember(memberId, host, port, System.currentTimeMillis());
 	}
 
 }

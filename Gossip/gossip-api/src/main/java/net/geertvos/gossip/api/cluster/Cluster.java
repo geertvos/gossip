@@ -23,6 +23,8 @@ import java.util.List;
  */
 public interface Cluster {
 
+	public ClusterMember getLocalMember();
+	
 	public List<ClusterMember> getActiveMembers();
 	
 	public List<ClusterMember> getPassiveMembers();

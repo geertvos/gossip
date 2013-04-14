@@ -21,7 +21,6 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import net.geertvos.gossip.api.cluster.ClusterHashProvider;
@@ -40,15 +39,6 @@ public class Md5HashProvider implements ClusterHashProvider<GossipClusterMember>
 	private final MessageDigest digester = DigestUtils.getMd5Digest();
 	private final Charset charset = Charsets.UTF_8;
 	
-	public class ClusterMemberComperator implements Comparator<GossipClusterMember> {
-
-		@Override
-		public int compare(GossipClusterMember arg0, GossipClusterMember arg1) {
-			return arg0.getId().compareTo(arg1.getId());
-		}
-		
-	}
-
 	@Override
 	public String hashCluster(Collection<GossipClusterMember> members) {
 		List<GossipClusterMember> sortedMembers = new ArrayList<GossipClusterMember>(members);
