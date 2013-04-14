@@ -16,6 +16,8 @@
  */
 package net.geertvos.gossip.api.cluster;
 
+import java.util.List;
+
 /**
  * @author Geert Vos
  */
@@ -29,7 +31,7 @@ public interface ClusterEventListener {
 	
 	public void onMemberDeactivated(ClusterMember member);
 	
-	public void onClusterStabilized();
+	public void onClusterStabilized(List<ClusterMember> members);
 	
 	public void onClusterDestabilized();
 	

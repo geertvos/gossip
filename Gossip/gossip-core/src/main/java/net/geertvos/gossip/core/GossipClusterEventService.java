@@ -80,13 +80,13 @@ public class GossipClusterEventService implements ClusterEventService{
 	}
 
 	@Override
-	public void notifyClusterStabilized() {
+	public void notifyClusterStabilized(final List<ClusterMember> members) {
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				for(ClusterEventListener listener : listeners) {
-					listener.onClusterStabilized();
+					listener.onClusterStabilized(members);
 				}
 			}
 		};

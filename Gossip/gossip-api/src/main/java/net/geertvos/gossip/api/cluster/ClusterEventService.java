@@ -1,5 +1,7 @@
 package net.geertvos.gossip.api.cluster;
 
+import java.util.List;
+
 import net.geertvos.gossip.api.cluster.ClusterEventListener;
 
 public interface ClusterEventService {
@@ -16,7 +18,7 @@ public interface ClusterEventService {
 	
 	public void notifyMemberDeactivated(ClusterMember member);
 	
-	public void notifyClusterStabilized();
+	public void notifyClusterStabilized(List<ClusterMember> members);
 	
 	public void notifyClusterDestabilized();
 	

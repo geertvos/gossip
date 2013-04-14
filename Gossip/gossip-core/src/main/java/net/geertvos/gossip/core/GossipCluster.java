@@ -17,6 +17,7 @@
 package net.geertvos.gossip.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -182,7 +183,9 @@ public class GossipCluster implements Cluster {
 	public void notifyStable(final boolean stable) {
 		if(stable) {
 			logger.debug("Cluster view stable");
-			eventService.notifyClusterStabilized();
+			List<ClusterMember> members = new ArrayList<ClusterMember>(activeMembers.values());
+			List<ClusterMember> unmodifieable = Collections.unmodifiableList(members);
+			eventService.notifyClusterStabilized(unmodifieable);
 		} else {
 			logger.debug("Cluster view unstable");
 			eventService.notifyClusterDestabilized();
