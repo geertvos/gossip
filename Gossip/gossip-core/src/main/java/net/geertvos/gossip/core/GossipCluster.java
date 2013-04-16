@@ -355,7 +355,12 @@ public class GossipCluster implements Cluster {
 					}
 				}
 			}
-			setResult(generateMessage(activeMembers.get(message.getFrom())));
+			GossipClusterMember member = activeMembers.get(message.getFrom()); 
+			if(member != null) {
+				setResult(generateMessage(member));
+			} else {
+				logger.warn("Gossip message came from dead node. This node or "+message.getFrom()+" porbably has a clock skew.");
+			}
 			checkStability();
 		}
 
