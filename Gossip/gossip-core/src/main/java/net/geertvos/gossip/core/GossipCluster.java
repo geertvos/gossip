@@ -18,7 +18,6 @@ package net.geertvos.gossip.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -147,7 +146,6 @@ public class GossipCluster implements Cluster {
 		List<GossipClusterMember> members = new ArrayList<GossipClusterMember>(activeMembers.values());
 		GossipClusterMember me = new GossipClusterMember(memberId, host, port, System.currentTimeMillis(), clusterStateHash);
 		members.add(me);
-//		clusterStateHash = hashProvider.hashCluster(members);
 		me.setHash(clusterStateHash);
 		reply.setMemberInfo(members);
 		return reply;
