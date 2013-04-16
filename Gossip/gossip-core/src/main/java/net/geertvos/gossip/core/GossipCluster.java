@@ -19,6 +19,7 @@ package net.geertvos.gossip.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -279,10 +280,12 @@ public class GossipCluster implements Cluster {
 		@Override
 		public void run() {
 			boolean stable = true;
-			for(GossipClusterMember member : activeMembers.values()) {
+			Iterator<GossipClusterMember> iterator = activeMembers.values().iterator();
+			while(iterator.hasNext()) {
+				GossipClusterMember member = iterator.next();
 				boolean active = System.currentTimeMillis() - member.getLastSeenOnline() < DEADNODE_DELAY;
 				if(!active) {
-					activeMembers.remove(member.getId());
+					iterator.remove();
 					passiveMembers.put(member.getId(), member);
 					notifyMemberDeactivated(member);
 					stable = false;
