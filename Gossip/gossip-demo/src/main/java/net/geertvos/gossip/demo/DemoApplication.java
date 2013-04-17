@@ -1,7 +1,9 @@
 package net.geertvos.gossip.demo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import net.geertvos.gossip.core.GossipCluster;
@@ -32,7 +34,9 @@ public class DemoApplication {
 				randomMember = random.nextInt(members.size());
 			}
 			GossipClusterMember member = members.get(randomMember);
-			GossipCluster cluster = new GossipCluster(CLUSTER, generateId(i), HOST, 8000+i, member );
+			Map<String,String> metaData = new HashMap<String, String>();
+			metaData.put("partitionServer.port", "5000");
+			GossipCluster cluster = new GossipCluster(CLUSTER, generateId(i), HOST, 8000+i, metaData , member);
 
 			GossipServer server1 = new GossipServer(cluster);
 			server1.start();

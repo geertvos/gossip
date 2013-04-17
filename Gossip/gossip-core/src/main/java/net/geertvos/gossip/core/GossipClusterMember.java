@@ -16,6 +16,9 @@
  */
 package net.geertvos.gossip.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.geertvos.gossip.api.cluster.ClusterMember;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -31,7 +34,8 @@ public class GossipClusterMember implements ClusterMember {
 	private int port;
 	private long lastSeenOnline;
 	private String hash;
-
+	private Map<String,String> metaData;
+	
 	public GossipClusterMember() {
 	}
 	
@@ -41,6 +45,7 @@ public class GossipClusterMember implements ClusterMember {
 		this.port = port;
 		this.lastSeenOnline = lastSeenOnline;
 		this.hash = hash;
+		metaData = new HashMap<String,String>();
 	}
 
 	public GossipClusterMember(String id, String ip, int port, long lastSeenOnline) {
@@ -90,5 +95,16 @@ public class GossipClusterMember implements ClusterMember {
 	public void setLastSeenOnline(long lastSeenOnline) {
 		this.lastSeenOnline = lastSeenOnline;
 	}
+	
+	public Map<String,String> getMetaData() {
+		return metaData;
+	}
 
+	public void setMetaData(Map<String,String> metaData) {
+		this.metaData  = metaData;
+	}
+	
+	public void addMetaData(String key, String value) {
+		this.metaData.put(key, value);
+	}
 }

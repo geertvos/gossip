@@ -12,8 +12,8 @@ public class ExtraMemberApplication {
 	
 	public static void main(String[] args) {
 		BasicConfigurator.configure();
-		GossipClusterMember member = new GossipClusterMember("Member-1", "localhost", 8001, System.currentTimeMillis(),"");
-		GossipCluster cluster = new GossipCluster(CLUSTER, "X", "localhost", 9000, member );
+		GossipClusterMember member = new GossipClusterMember("Computer", "192.168.0.104", 9000, 0,"");
+		GossipCluster cluster = new GossipCluster(CLUSTER, "Laptop", "192.168.0.103", 9000, member );
 		GossipServer server1 = new GossipServer(cluster);
 		server1.start();
 	}

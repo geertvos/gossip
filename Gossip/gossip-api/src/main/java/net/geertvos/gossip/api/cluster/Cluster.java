@@ -29,8 +29,6 @@ public interface Cluster {
 	
 	public List<ClusterMember> getPassiveMembers();
 	
-	public List<ClusterMember> getMembers();
-	
 	public ClusterState getState();
 	
 	public void setEventService(ClusterEventService service);

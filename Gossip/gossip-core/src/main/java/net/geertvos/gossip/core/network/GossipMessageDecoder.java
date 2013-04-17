@@ -33,6 +33,7 @@ public class GossipMessageDecoder extends OneToOneDecoder {
 	@Override
 	protected Object decode(ChannelHandlerContext ctx, Channel channel, Object msg) throws Exception {
 		String message = (String)msg;
+		System.out.println(message);
 		GossipMessage gossipMessage = mapper.readValue(message, GossipMessage.class);
 		return gossipMessage;
 	}
