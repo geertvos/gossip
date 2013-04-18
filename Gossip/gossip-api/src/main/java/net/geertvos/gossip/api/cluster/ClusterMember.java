@@ -23,10 +23,12 @@ public interface ClusterMember {
 
 	public String getId();
 	
-	public String getIp();
+	public String getHost();
 	
 	public int getPort();
 	
 	public long getLastSeenOnline();
+	
+	public String getMetaData(String key);
 
 }

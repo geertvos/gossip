@@ -36,7 +36,5 @@ public class GossipMessageDecoder extends OneToOneDecoder {
 		GossipMessage gossipMessage = mapper.readValue(message, GossipMessage.class);
 		return gossipMessage;
 	}
-
-	
 	
 }

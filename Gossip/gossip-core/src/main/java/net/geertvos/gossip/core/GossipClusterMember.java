@@ -30,7 +30,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 public class GossipClusterMember implements ClusterMember {
 
 	private String id;
-	private String ip;
+	private String host;
 	private int port;
 	private long lastSeenOnline;
 	private String hash;
@@ -39,9 +39,9 @@ public class GossipClusterMember implements ClusterMember {
 	public GossipClusterMember() {
 	}
 	
-	public GossipClusterMember(String id, String ip, int port, long lastSeenOnline, String hash) {
+	public GossipClusterMember(String id, String host, int port, long lastSeenOnline, String hash) {
 		this.id = id;
-		this.ip = ip;
+		this.host = host;
 		this.port = port;
 		this.lastSeenOnline = lastSeenOnline;
 		this.hash = hash;
@@ -58,8 +58,8 @@ public class GossipClusterMember implements ClusterMember {
 	}
 
 	@Override
-	public String getIp() {
-		return ip;
+	public String getHost() {
+		return host;
 	}
 
 	@Override
@@ -76,8 +76,8 @@ public class GossipClusterMember implements ClusterMember {
 		this.id = id;
 	}
 
-	public void setIp(String ip) {
-		this.ip = ip;
+	public void setHost(String ip) {
+		this.host = ip;
 	}
 
 	public void setPort(int port) {
@@ -106,5 +106,9 @@ public class GossipClusterMember implements ClusterMember {
 	
 	public void addMetaData(String key, String value) {
 		this.metaData.put(key, value);
+	}
+	
+	public String getMetaData(String key) {
+		return metaData.get(key);
 	}
 }

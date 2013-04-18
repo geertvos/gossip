@@ -117,7 +117,7 @@ public class GossipServer {
 		}
 
 		private void gossipWith(final ClusterMember member) {
-			ChannelFuture future = clientBootstrap.connect(new InetSocketAddress(member.getIp(),member.getPort()));
+			ChannelFuture future = clientBootstrap.connect(new InetSocketAddress(member.getHost(),member.getPort()));
 			future.addListener(new ChannelFutureListener() {
 				
 				@Override

@@ -133,7 +133,7 @@ public class GossipCluster implements Cluster {
 	}
 	
 	public String getHost() {
-		return me.getIp();
+		return me.getHost();
 	}
 
 	public int getPort() {
