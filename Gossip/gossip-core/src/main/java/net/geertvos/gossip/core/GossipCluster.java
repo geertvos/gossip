@@ -18,9 +18,11 @@ package net.geertvos.gossip.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -49,22 +51,24 @@ public class GossipCluster implements Cluster {
 	private final LinkedHashMap<String,GossipClusterMember> passiveMembers = new LinkedHashMap<String, GossipClusterMember>();
 	private final ClusterHashProvider<GossipClusterMember> hashProvider = new Md5HashProvider();
 	private final ScheduledThreadPoolExecutor scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
-	private final String clusterId;
 	private final ClusterMemberComperator<ClusterMember> memberComperator = new ClusterMemberComperator<ClusterMember>();
+	private final String clusterId;
+	private final GossipClusterMember me;
 	
 	private ClusterEventService eventService = new GossipClusterEventService();
 	private ExecutorService executorService;
 	private ClusterState clusterState = ClusterState.UNSTABLE;
 	private String clusterStateHash = "";
-	private final String memberId;
-	private final String host;
-	private final int port;
-
+	
 	public GossipCluster(String clusterId, String memberId, String host, int port, GossipClusterMember ... members) {
+		this(clusterId, memberId, host, port, new HashMap<String, String>(), members);
+	}
+	
+	public GossipCluster(String clusterId, String memberId, String host, int port, Map<String,String> metaData, GossipClusterMember ... members) {
 		this.clusterId = clusterId;
-		this.memberId = memberId;
-		this.host = host;
-		this.port = port;
+		this.me = new GossipClusterMember(memberId, host, port, System.currentTimeMillis(), clusterStateHash);
+		this.me.setMetaData(metaData);
+		
 		this.executorService = Executors.newSingleThreadExecutor(new NamedThreadFactory("Gossip Cluster "+memberId));
 		for(GossipClusterMember member : members) {
 			if(member.getId().equals(memberId)) {
@@ -90,11 +94,6 @@ public class GossipCluster implements Cluster {
 	}
 
 	@Override
-	public List<ClusterMember> getMembers() {
-		return null;
-	}
-
-	@Override
 	public ClusterState getState() {
 		return clusterState;
 	}
@@ -111,7 +110,7 @@ public class GossipCluster implements Cluster {
 
 	public GossipMessage handleGossip(GossipMessage message) {
 		if(message.getCluster().equals(clusterId)) {
-			if( message.getTo().equals(memberId) ) {
+			if( message.getTo().equals(me.getId()) ) {
 				HandleGossipMessage task = new HandleGossipMessage(message);
 				executorService.execute(task);
 				return task.call();
@@ -125,7 +124,7 @@ public class GossipCluster implements Cluster {
 	}
 
 	public GossipMessage createGossipMessage(ClusterMember to) {
-		if(to.getId().equals(memberId)) {
+		if(to.getId().equals(me.getId())) {
 			logger.error("Sending a message to myself? Why?");
 		}
 		GenerateMessageTask task = new GenerateMessageTask(to);
@@ -134,17 +133,17 @@ public class GossipCluster implements Cluster {
 	}
 	
 	public String getHost() {
-		return host;
+		return me.getIp();
 	}
 
 	public int getPort() {
-		return port;
+		return me.getPort();
 	}
 	
 	private GossipMessage generateMessage(ClusterMember to) {
-		GossipMessage reply = new GossipMessage(clusterId, memberId, to.getId());
+		GossipMessage reply = new GossipMessage(clusterId, me.getId(), to.getId());
 		List<GossipClusterMember> members = new ArrayList<GossipClusterMember>(activeMembers.values());
-		GossipClusterMember me = new GossipClusterMember(memberId, host, port, System.currentTimeMillis(), clusterStateHash);
+		me.setLastSeenOnline(System.currentTimeMillis());
 		members.add(me);
 		me.setHash(clusterStateHash);
 		reply.setMemberInfo(members);
@@ -244,7 +243,7 @@ public class GossipCluster implements Cluster {
 		@Override
 		public void run() {
 			List<GossipClusterMember> members = new ArrayList<GossipClusterMember>(activeMembers.values());
-			GossipClusterMember me = new GossipClusterMember(memberId, host, port, System.currentTimeMillis(), clusterStateHash);
+			me.setLastSeenOnline(System.currentTimeMillis());
 			members.add(me);
 			String clusterStateHash2 = hashProvider.hashCluster(members);
 			boolean stable = true;
@@ -309,7 +308,7 @@ public class GossipCluster implements Cluster {
 		@Override
 		public void run() {
 			for(GossipClusterMember member : message.getMemberInfo()) {
-				if(member.getId().equals(memberId)) {
+				if(member.getId().equals(me.getId())) {
 					//Skip self
 					continue;
 				}
@@ -368,7 +367,7 @@ public class GossipCluster implements Cluster {
 
 	@Override
 	public ClusterMember getLocalMember() {
-		return new GossipClusterMember(memberId, host, port, System.currentTimeMillis());
+		return me;
 	}
 
 }
