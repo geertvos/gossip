@@ -29,16 +29,16 @@ public interface ClusterEventService {
 	
 	void unregisterListener(ClusterEventListener listener);
 	
-	public void notifyNewActiveMember(ClusterMember member);
+	public void notifyNewActiveMember(ClusterMember member, List<ClusterMember> members);
 	
-	public void notifyNewInactiveMember(ClusterMember member);
+	public void notifyNewInactiveMember(ClusterMember member, List<ClusterMember> members);
 	
-	public void notifyMemberActivated(ClusterMember member);
+	public void notifyMemberActivated(ClusterMember member, List<ClusterMember> members);
 	
-	public void notifyMemberDeactivated(ClusterMember member);
+	public void notifyMemberDeactivated(ClusterMember member, List<ClusterMember> members);
 	
 	public void notifyClusterStabilized(List<ClusterMember> members);
 	
-	public void notifyClusterDestabilized();
+	public void notifyClusterDestabilized(List<ClusterMember> members);
 	
 }

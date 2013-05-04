@@ -45,13 +45,13 @@ public class GossipClusterEventService implements ClusterEventService{
 	}
 
 	@Override
-	public void notifyNewActiveMember(final ClusterMember member) {
+	public void notifyNewActiveMember(final ClusterMember member, final List<ClusterMember> members) {
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				for(ClusterEventListener listener : listeners) {
-					listener.onNewInactiveMember(member);
+					listener.onNewInactiveMember(member, members);
 				}
 			}
 		};
@@ -59,13 +59,13 @@ public class GossipClusterEventService implements ClusterEventService{
 	}
 
 	@Override
-	public void notifyNewInactiveMember(final ClusterMember member) {
+	public void notifyNewInactiveMember(final ClusterMember member,final List<ClusterMember> members) {
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				for(ClusterEventListener listener : listeners) {
-					listener.onNewInactiveMember(member);
+					listener.onNewInactiveMember(member, members);
 				}
 			}
 		};
@@ -73,13 +73,13 @@ public class GossipClusterEventService implements ClusterEventService{
 	}
 
 	@Override
-	public void notifyMemberActivated(final ClusterMember member) {
+	public void notifyMemberActivated(final ClusterMember member, final List<ClusterMember> members) {
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				for(ClusterEventListener listener : listeners) {
-					listener.onMemberActivated(member);
+					listener.onMemberActivated(member, members);
 				}
 			}
 		};
@@ -87,13 +87,13 @@ public class GossipClusterEventService implements ClusterEventService{
 	}
 
 	@Override
-	public void notifyMemberDeactivated(final ClusterMember member) {
+	public void notifyMemberDeactivated(final ClusterMember member, final List<ClusterMember> members) {
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				for(ClusterEventListener listener : listeners) {
-					listener.onMemberDeactivated(member);
+					listener.onMemberDeactivated(member, members);
 				}
 			}
 		};
@@ -115,13 +115,13 @@ public class GossipClusterEventService implements ClusterEventService{
 	}
 
 	@Override
-	public void notifyClusterDestabilized() {
+	public void notifyClusterDestabilized(final List<ClusterMember> members) {
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				for(ClusterEventListener listener : listeners) {
-					listener.onClusterDestabilized();
+					listener.onClusterDestabilized(members);
 				}
 			}
 		};

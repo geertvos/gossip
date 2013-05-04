@@ -162,38 +162,46 @@ public class GossipCluster implements Cluster {
 	
 	public void notifyNewInactive(final GossipClusterMember member) {
 		logger.debug("New inactive member "+member.getId());
-		eventService.notifyNewInactiveMember(member);
+		List<ClusterMember> members = getAllClusterMembers();
+		eventService.notifyNewInactiveMember(member, members);
 	}
 	
 	public void notifyNewActive(final GossipClusterMember member) {
 		logger.debug("New active member "+member.getId());
-		eventService.notifyNewActiveMember(member);
+		List<ClusterMember> members = getAllClusterMembers();
+		eventService.notifyNewActiveMember(member, members);
 	}
 	
 	public void notifyMemberDeactivated(final GossipClusterMember member) {
 		logger.debug("Deactivated member "+member.getId());
-		eventService.notifyMemberDeactivated(member);
+		List<ClusterMember> members = getAllClusterMembers();
+		eventService.notifyMemberDeactivated(member, members);
 	}
 	
 	public void notifyMemberActivated(final GossipClusterMember member) {
 		logger.debug("Activated member "+member.getId());
-		eventService.notifyMemberActivated(member);
+		List<ClusterMember> members = getAllClusterMembers();
+		eventService.notifyMemberActivated(member, members);
 	}
 	
 	public void notifyStable(final boolean stable) {
+		List<ClusterMember> unmodifieable = getAllClusterMembers();
 		if(stable) {
 			logger.debug("Cluster view stable");
-			List<ClusterMember> members = new ArrayList<ClusterMember>(activeMembers.values());
-			members.add(getLocalMember());
-			Collections.sort(members, memberComperator);
-			List<ClusterMember> unmodifieable = Collections.unmodifiableList(members);
 			eventService.notifyClusterStabilized(unmodifieable);
 		} else {
 			logger.debug("Cluster view unstable");
-			eventService.notifyClusterDestabilized();
+			eventService.notifyClusterDestabilized(unmodifieable);
 		}
 	}
 
+	private List<ClusterMember> getAllClusterMembers() {
+		List<ClusterMember> members = new ArrayList<ClusterMember>(activeMembers.values());
+		members.add(getLocalMember());
+		Collections.sort(members, memberComperator);
+		List<ClusterMember> unmodifieable = Collections.unmodifiableList(members);
+		return unmodifieable;
+	}
 
 	
 	class GetActivePartitipantsTask extends GossipClusterTask<List<ClusterMember>> {
