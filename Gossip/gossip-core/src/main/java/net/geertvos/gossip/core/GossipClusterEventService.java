@@ -51,7 +51,7 @@ public class GossipClusterEventService implements ClusterEventService{
 			@Override
 			public void run() {
 				for(ClusterEventListener listener : listeners) {
-					listener.onNewInactiveMember(member, members);
+					listener.onNewActiveMember(member, members);
 				}
 			}
 		};
