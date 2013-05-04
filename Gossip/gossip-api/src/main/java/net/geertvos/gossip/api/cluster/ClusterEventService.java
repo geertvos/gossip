@@ -21,6 +21,7 @@ import java.util.List;
 import net.geertvos.gossip.api.cluster.ClusterEventListener;
 
 /**
+ * The event service can be used to implement different ways of handling event fired by the cluster.
  * @author Geert Vos
  */
 public interface ClusterEventService {

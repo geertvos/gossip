@@ -23,16 +23,40 @@ import java.util.List;
  */
 public interface Cluster {
 
+	/**
+	 * Get the cluster member of the local host.
+	 * @return
+	 */
 	public ClusterMember getLocalMember();
 	
+	/**
+	 * Get all members marked as active at the time of calling this method.
+	 * @return
+	 */
 	public List<ClusterMember> getActiveMembers();
 	
+	/**
+	 * Get all passive members at the time of calling this method.
+	 * @return
+	 */
 	public List<ClusterMember> getPassiveMembers();
 	
+	/**
+	 * Returns the state of the current cluster. Can be unstable or stable.
+	 * @return ClusterState 
+	 */
 	public ClusterState getState();
 	
+	/**
+	 * Set the service responsible for handling event fired by the service.
+	 * @param service
+	 */
 	public void setEventService(ClusterEventService service);
 	
+	/**
+	 * Get the event service.
+	 * @return
+	 */
 	public ClusterEventService getEventService();
 	
 }

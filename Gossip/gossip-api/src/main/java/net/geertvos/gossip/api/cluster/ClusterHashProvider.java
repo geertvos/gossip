@@ -19,6 +19,8 @@ package net.geertvos.gossip.api.cluster;
 import java.util.Collection;
 
 /**
+ * The ClusterHash provider implements a hashing algorithm to check the cluster stability.
+ * 
  * @author Geert Vos
  */
 public interface ClusterHashProvider<T extends ClusterMember> {

@@ -21,14 +21,35 @@ package net.geertvos.gossip.api.cluster;
  */
 public interface ClusterMember {
 
+	/**
+	 * The unique id of this member in the cluster.
+	 * @return
+	 */
 	public String getId();
 	
+	/**
+	 * The hostname on which the member can be reached.
+	 * @return
+	 */
 	public String getHost();
 	
+	/**
+	 * The port number on which this cluster member can be reached.
+	 * @return
+	 */
 	public int getPort();
 	
+	/**
+	 * Timestamp of when this member was last seen. (local to the member)
+	 * @return
+	 */
 	public long getLastSeenOnline();
 	
+	/**
+	 * Get any meta data that might have been provided for this member.
+	 * @param key The key of a key value pair.
+	 * @return The value or null if not found
+	 */
 	public String getMetaData(String key);
 
 }
