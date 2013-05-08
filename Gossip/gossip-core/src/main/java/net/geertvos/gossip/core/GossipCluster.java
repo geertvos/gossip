@@ -45,7 +45,7 @@ public class GossipCluster implements Cluster {
 
 	private final Logger logger = Logger.getLogger(GossipCluster.class);
 	
-	private static final int DEADNODE_DELAY = 5000;
+	private static final int DEADNODE_DELAY = 30000;
 	
 	private final LinkedHashMap<String,GossipClusterMember> activeMembers = new LinkedHashMap<String, GossipClusterMember>();
 	private final LinkedHashMap<String,GossipClusterMember> passiveMembers = new LinkedHashMap<String, GossipClusterMember>();
