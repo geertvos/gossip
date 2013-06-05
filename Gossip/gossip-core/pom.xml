@@ -41,6 +41,12 @@
 			<version>${netty.version}</version>
 		</dependency>
 
+		<dependency>
+		    <groupId>org.msgpack</groupId>
+		    <artifactId>msgpack</artifactId>
+		    <version>0.6.7</version>
+		</dependency>
+		
 	</dependencies>
 
 </project>

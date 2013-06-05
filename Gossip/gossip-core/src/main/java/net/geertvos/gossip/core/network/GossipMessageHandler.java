@@ -21,6 +21,7 @@ import java.io.IOException;
 import net.geertvos.gossip.core.GossipCluster;
 import net.geertvos.gossip.core.GossipMessage;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -33,6 +34,7 @@ import org.jboss.netty.channel.SimpleChannelHandler;
  */
 public class GossipMessageHandler extends SimpleChannelHandler {
 
+	private static final Logger LOG = Logger.getLogger(GossipMessageHandler.class);
 	private final GossipCluster cluster;
 	private final boolean disconnect;
 	
@@ -44,15 +46,18 @@ public class GossipMessageHandler extends SimpleChannelHandler {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		GossipMessage message = (GossipMessage) e.getMessage();
-		GossipMessage reply = cluster.handleGossip(message);
-		if(reply != null) {
-			ChannelFuture future = ctx.getChannel().write(reply);
-			if(disconnect) {
-				future.addListener(ChannelFutureListener.CLOSE);
-			}
-		} else {
-			ctx.getChannel().close();
-		}
+		LOG.info("Received gossip message from "+message.getFrom());
+		cluster.handleGossip(message);
+//		if(reply != null) {
+//			LOG.info("Wrote reply to "+message.getFrom());
+//
+//			ChannelFuture future = ctx.getChannel().write(reply);
+//			if(disconnect) {
+//				future.addListener(ChannelFutureListener.CLOSE);
+//			}
+//		} else {
+//			ctx.getChannel().close();
+//		}
 	}
 
 	@Override

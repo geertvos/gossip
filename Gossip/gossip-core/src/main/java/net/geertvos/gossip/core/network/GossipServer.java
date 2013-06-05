@@ -53,10 +53,10 @@ public class GossipServer {
 	public GossipServer(GossipCluster cluster) {
 		this.cluster = cluster;
 		
-		serverBootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+		serverBootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(Executors.newFixedThreadPool(1), Executors.newFixedThreadPool(8)));
 		serverBootstrap.setPipelineFactory(new GossipPipelineFactory(cluster,false));
 
-		clientBootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool()));
+		clientBootstrap = new ClientBootstrap(new NioClientSocketChannelFactory(Executors.newFixedThreadPool(1), Executors.newFixedThreadPool(8)));
 		clientBootstrap.setPipelineFactory(new GossipPipelineFactory(cluster,true));
 		
 	}
@@ -105,9 +105,9 @@ public class GossipServer {
 		}
 
 		private void randomGossip() {
-			List<ClusterMember> members = cluster.getActiveMembers();
+			List<ClusterMember> members = cluster.getRawActiveMembers();
 			if(members.isEmpty()) {
-				members.addAll(cluster.getPassiveMembers());
+				members.addAll(cluster.getRawPassiveMembers());
 			}
 			if(!members.isEmpty()) {
 				int index = random.nextInt(members.size());
@@ -118,6 +118,7 @@ public class GossipServer {
 
 		private void gossipWith(final ClusterMember member) {
 			ChannelFuture future = clientBootstrap.connect(new InetSocketAddress(member.getHost(),member.getPort()));
+			future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
 			future.addListener(new ChannelFutureListener() {
 				
 				@Override
@@ -125,7 +126,10 @@ public class GossipServer {
 					if(future.isSuccess()) {
 						ChannelFuture f = future.getChannel().write(cluster.createGossipMessage(member));
 						f.addListener(ChannelFutureListener.CLOSE);
+					} else {
+						future.getChannel().close();
 					}
+					
 				}
 			});
 		}

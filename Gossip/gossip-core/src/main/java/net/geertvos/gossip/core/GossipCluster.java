@@ -86,6 +86,16 @@ public class GossipCluster implements Cluster {
 		return task.call();
 	}
 
+	public List<ClusterMember> getRawActiveMembers() {
+		return new ArrayList<ClusterMember>(activeMembers.values());
+	}
+
+
+	public List<ClusterMember> getRawPassiveMembers() {
+		return new ArrayList<ClusterMember>(passiveMembers.values());
+	}
+
+	
 	@Override
 	public List<ClusterMember> getPassiveMembers() {
 		GetInactivePartitipantsTask task = new GetInactivePartitipantsTask();
@@ -113,7 +123,7 @@ public class GossipCluster implements Cluster {
 			if( message.getTo().equals(me.getId()) ) {
 				HandleGossipMessage task = new HandleGossipMessage(message);
 				executorService.execute(task);
-				return task.call();
+//				return task.call();
 			} else {
 				logger.error("Got a gossip message that was intended for someone else: "+message.getTo());
 			}
@@ -140,7 +150,7 @@ public class GossipCluster implements Cluster {
 		return me.getPort();
 	}
 	
-	private GossipMessage generateMessage(ClusterMember to) {
+	public GossipMessage generateMessage(ClusterMember to) {
 		GossipMessage reply = new GossipMessage(clusterId, me.getId(), to.getId());
 		List<GossipClusterMember> members = new ArrayList<GossipClusterMember>(activeMembers.values());
 		me.setLastSeenOnline(System.currentTimeMillis());

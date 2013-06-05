@@ -21,6 +21,7 @@ import java.util.List;
 /**
  * @author Geert Vos
  */
+
 public class GossipMessage {
 
 	private List<GossipClusterMember> memberInfo;
