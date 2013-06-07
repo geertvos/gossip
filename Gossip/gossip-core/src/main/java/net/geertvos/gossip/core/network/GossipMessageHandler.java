@@ -46,8 +46,8 @@ public class GossipMessageHandler extends SimpleChannelHandler {
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		GossipMessage message = (GossipMessage) e.getMessage();
-		LOG.info("Received gossip message from "+message.getFrom());
 		cluster.handleGossip(message);
+		//TODO: Fix reply for way better clustering!
 //		if(reply != null) {
 //			LOG.info("Wrote reply to "+message.getFrom());
 //
@@ -56,7 +56,7 @@ public class GossipMessageHandler extends SimpleChannelHandler {
 //				future.addListener(ChannelFutureListener.CLOSE);
 //			}
 //		} else {
-//			ctx.getChannel().close();
+			ctx.getChannel().close();
 //		}
 	}
 

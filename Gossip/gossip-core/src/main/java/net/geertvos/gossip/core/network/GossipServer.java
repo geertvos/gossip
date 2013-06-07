@@ -124,10 +124,9 @@ public class GossipServer {
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception {
 					if(future.isSuccess()) {
-						ChannelFuture f = future.getChannel().write(cluster.createGossipMessage(member));
-						f.addListener(ChannelFutureListener.CLOSE);
+						future.getChannel().write(cluster.createGossipMessage(member)).addListener(ChannelFutureListener.CLOSE);
 					} else {
-						future.getChannel().close();
+						future.addListener(ChannelFutureListener.CLOSE);
 					}
 					
 				}
