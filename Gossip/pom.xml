@@ -53,5 +53,11 @@
 		<module>gossip-core</module>
 		<module>gossip-demo</module>
 	</modules>
+	
+	<scm>
+		<connection>scm:git:git@github.com:geertvos/gossip.git</connection>
+		<url>scm:git:git@github.com:geertvos/gossip.git</url>
+		<developerConnection>scm:git:git@github.com:geertvos/gossip.git</developerConnection>
+  	</scm>
 
 </project>
