@@ -61,5 +61,13 @@ public class GossipClusterBuilder {
 		server1.start();
 		return cluster;
 	}
+
+	public GossipClusterBuilder withMetadata(String key, String value) {
+		if(metadata==null) {
+			metadata = new HashMap<String, String>();
+		}
+		metadata.put(key, value);
+		return this;
+	}
 	
 }
